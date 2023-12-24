@@ -22,20 +22,31 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const ProductCollection = client.db("ProductManageDB").collection("products");
+        const userCollection = client.db("ProductManageDB").collection("users");
+
         //Product realated API
         app.get('/products', async (req, res) => {
             
             const products = await ProductCollection.find().toArray();
             res.send(products);
         });
-        app.get('/Details', async (req, res) => {
+        app.get('/Details/:id', async (req, res) => {
             
                 const id = req.params.id;
                 const query = { _id: new ObjectId(id) }
                 const result = await ProductCollection.findOne(query);
                 res.send(result);
         });
-
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email }
+            const existingUser = await userCollection.findOne(query);
+            if (existingUser) {
+              return res.send({ message: 'user already exists', insertedId: null })
+            }
+            const result = await userCollection.insertOne(user);
+            res.send(result);
+          });
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
