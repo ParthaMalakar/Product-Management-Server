@@ -21,12 +21,19 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        const userCollection = client.db("ProductManageDB").collection("products");
+        const ProductCollection = client.db("ProductManageDB").collection("products");
         //Product realated API
         app.get('/products', async (req, res) => {
             
-            const products = await TaskCollection.find().toArray();
+            const products = await ProductCollection.find().toArray();
             res.send(products);
+        });
+        app.get('/Details', async (req, res) => {
+            
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) }
+                const result = await ProductCollection.findOne(query);
+                res.send(result);
         });
 
         // Send a ping to confirm a successful connection
